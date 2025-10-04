@@ -1,1 +1,1 @@
-export const DB_NAME = 'COdeCraft';
+export const DB_NAME = 'CodeCraft';
