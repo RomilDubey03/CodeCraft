@@ -4,7 +4,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import validate from "../utils/dataValidator.js";
-
+import { redisClient } from "../db/redisDbConnect.js";
+import JWT from "jsonwebtoken";
 //Register
 const registerUser = asyncHandler(async (req, res) => {
     // username, fullName, email, age, password
@@ -83,3 +84,27 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //LogOut
+const logOutUser = asyncHandler(async () => {
+    const { accessToken } = req.cookies;
+
+    const payload = JWT.decode(accessToken);
+
+    redisClient.set(`accessToken:${accessToken}`, "BLOCKED");
+    redisClient.expireAt(`accessToken:${accessToken}`, payload.exp);
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    };
+    return res
+        .send(200)
+        .clearCookie("accessToken", options)
+        .json(new ApiResponse(200, {}, "User logged out Successfully!"));
+});
+
+export {
+    registerUser,
+    loginUser,
+    logOutUser,
+};
