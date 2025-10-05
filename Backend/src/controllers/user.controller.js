@@ -2,7 +2,6 @@ import { User } from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/apiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
 import validate from "../utils/dataValidator.js";
 import { redisClient } from "../db/redisDbConnect.js";
 import JWT from "jsonwebtoken";
@@ -17,19 +16,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (userExists) throw new ApiError(409, "User already exists!");
 
-    //Add role
-    user.role = "user";
+    const user = await User.create({
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
+        fullName: fullName,
+        password: password,
+        age: age,
+        role: "user"
+    });
 
-    const user = await User.create(
-        username.toLowerCase(),
-        email.toLowerCase(),
-        fullName,
-        password,
-        age,
-        user.role
-    );
-
-    const accessToken = user.generateAcsessToken(user._id);
+    const accessToken = user.generateAccessToken(user._id);
 
     const createdUser = await User.findById(user._id).select("-password");
 
@@ -56,7 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!username && !email)
         throw new ApiError(400, "username or email is missing!");
 
-    const user = User.findOne({
+    const user = await User.findOne({
         $or: [{ username }, { email }]
     });
 
@@ -67,7 +63,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPasswordCorrect)
         throw new ApiError(401, "Invalid user credentials!");
 
-    const accessToken = user.generateAcsessToken(user._id);
+    const accessToken = user.generateAccessToken(user._id);
 
     const options = {
         httpOnly: true,
@@ -84,13 +80,13 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //LogOut
-const logOutUser = asyncHandler(async () => {
+const logOutUser = asyncHandler(async (req, res) => {
     const { accessToken } = req.cookies;
 
     const payload = JWT.decode(accessToken);
 
-    redisClient.set(`accessToken:${accessToken}`, "BLOCKED");
-    redisClient.expireAt(`accessToken:${accessToken}`, payload.exp);
+    await redisClient.set(`accessToken:${accessToken}`, "BLOCKED");
+    await redisClient.expireAt(`accessToken:${accessToken}`, payload.exp);
 
     const options = {
         httpOnly: true,
@@ -98,13 +94,50 @@ const logOutUser = asyncHandler(async () => {
         sameSite: "None"
     };
     return res
-        .send(200)
+        .status(200)
         .clearCookie("accessToken", options)
         .json(new ApiResponse(200, {}, "User logged out Successfully!"));
 });
 
-export {
-    registerUser,
-    loginUser,
-    logOutUser,
-};
+
+//Admin Routes
+const adminRegister = asyncHandler(async (req, res) =>{
+    // username, fullName, email, age, password
+    validate(req.body);
+    const { username, email, fullName, password, age } = req.body;
+    const userExists = await User.findOne({
+        $or: [{ username }, { email }]
+    });
+
+    if (userExists) throw new ApiError(409, "User already exists!");
+
+    const user = await User.create({
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
+        fullName: fullName,
+        password: password,
+        age: age,
+        role: "admin"
+    });
+
+    const accessToken = user.generateAccessToken(user._id);
+
+    const createdUser = await User.findById(user._id).select("-password");
+
+    if (!createdUser) throw new ApiError(500, "User not registered");
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None"
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json(
+            new ApiResponse(200, createdUser, "Admin Registered Successfully")
+        );
+});
+
+export { registerUser, loginUser, logOutUser, adminRegister};

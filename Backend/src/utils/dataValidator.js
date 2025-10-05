@@ -1,5 +1,5 @@
 import validator from 'validator';
-import ApiError from './apiError';
+import ApiError from './apiError.js';
 
 const validate = (data)=>{
     const mandatoryFields = ['fullName', 'email', 'password'];
@@ -12,9 +12,9 @@ const validate = (data)=>{
     if(!validator.isEmail(data.email)){
         throw new  ApiError(400, "Invalid Email ID");
     }
-    if(!validator.isStrongPassword(data.password)){
-        throw new ApiError(400, "Password entered is weak");
-    }
+    // if(!validator.isStrongPassword(data.password)){
+    //     throw new ApiError(400, "Password entered is weak");
+    // }
 }
 
 export default validate;

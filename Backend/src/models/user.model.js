@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
     {
@@ -31,7 +33,8 @@ const userSchema = new mongoose.Schema(
         age: {
             type: Number,
             min: 10,
-            max: 80
+            max: 80,
+            default: 18
         },
         role: {
             type: String,
@@ -45,14 +48,14 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-userSchama.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     return next();
 });
 
-userSchama.methods = {
-    isPasswordCorrecty: async function (enteredPassword) {
+userSchema.methods = {
+    isPasswordCorrect: async function (enteredPassword) {
         return await bcrypt.compare(enteredPassword, this.password);
     },
 
@@ -62,16 +65,17 @@ userSchama.methods = {
                 _id: this._id,
                 email: this.email,
                 username: this.username,
+                role: this.role,
                 fullName: this.fullName
             },
             process.env.ACCESS_TOKEN_SECRET,
             {
-                expiresAt: process.env.ACCESS_TOKEN_EXPIRY
+                expiresIn: process.env.ACCESS_TOKEN_EXPIRY
             }
         );
     }
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 
 export { User };
