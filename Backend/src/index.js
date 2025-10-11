@@ -3,7 +3,6 @@ import connectToDB from "./db/dbconnect.js";
 import { redisClient } from "./db/redisDbConnect.js";
 import app from "./app.js";
 
-
 dotenv.config({
     path: "./.env" // if giving prob try "./.env"
 });

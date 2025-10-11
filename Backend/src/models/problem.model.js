@@ -58,7 +58,7 @@ const problemSchema = new mongoose.Schema(
         ],
         starterCode: [
             {
-                langauge: {
+                language: {
                     type: String,
                     required: true
                 },
@@ -68,10 +68,21 @@ const problemSchema = new mongoose.Schema(
                 }
             }
         ],
+        referenceSolution: [
+            {
+                language: {
+                    type: String,
+                    required: true
+                },
+                completeCode: {
+                    type: String,
+                    required: true
+                }
+            }
+        ],
         problemCreator: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
         }
     },
     { timestamps: true }
