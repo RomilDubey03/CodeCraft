@@ -18,6 +18,6 @@ router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logOutUser);
 
 //Admin Authorised Route
-router.route("/adminregister").post(adminRegister);
+router.route("/adminregister").post(verifyAdminJWT, adminRegister);
 
 export default router;
