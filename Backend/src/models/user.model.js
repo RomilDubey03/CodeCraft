@@ -40,8 +40,14 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: ["user", "admin"],
             default: "user"
-        }
+        },
         // problemSolved : here reference the problem schema
+        problemSolved: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Problem"
+            }
+        ]
     },
     {
         timestamps: true
@@ -76,6 +82,6 @@ userSchema.methods = {
     }
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 export { User };

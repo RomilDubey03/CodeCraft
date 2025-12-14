@@ -1,4 +1,5 @@
 import { Problem } from "../models/problem.model.js";
+import { User } from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import {
     getLanguageById,
@@ -54,10 +55,24 @@ export const createProblem = asyncHandler(async (req, res) => {
             stdin: testcase.input,
             expected_output: testcase.output
         }));
-
+        //would look like this
+        // [
+        //   {
+        //     source_code: "print('Hello')",
+        //     language_id: 71,
+        //     stdin: "5",          // Taken from the first test case
+        //     expected_output: "25" // Taken from the first test case
+        //   },
+        //   {
+        //     source_code: "print('Hello')",
+        //     language_id: 71,
+        //     stdin: "10",         // Taken from the second test case
+        //     expected_output: "100" // Taken from the second test case
+        //   }
+        // ]
         const batchSubmissionResult = await submitBatch(submissions);
 
-        const tokenList = batchSubmissionResult.map((value) => (value.token));
+        const tokenList = batchSubmissionResult.map((value) => value.token);
 
         const tokenSubmissionResult = await submitToken(tokenList);
 
@@ -231,3 +246,58 @@ export const getAllProblems = asyncHandler(async (req, res) => {
         );
 });
 
+// export const problemSolvedByUser = asyncHandler(async (req, res) => {
+//     const userId = req.user._id;
+//     const problemId = req.params.id;
+//     if (!userId || !problemId) {
+//         throw new ApiError(400, "Some fields are missing");
+//     }
+//     const problem = await Problem.findById(problemId);
+
+//     if (!problem) throw new ApiError(404, "Problem not found");
+//     const user = req.user;
+//     if (!user.problemSolved.includes(problemId)) {
+//         user.problemSolved.push(problemId);
+//         await user.save();
+//     }
+//     return res
+//         .status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 {},
+//                 "Problem marked as solved by the user"
+//             )
+//         );
+// });
+
+export const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    if (!userId) {
+        throw new ApiError(400, "User ID missing");
+    }
+
+    const user = await User.findById(userId).populate({
+        path: "problemSolved",
+        select: "_id title difficulty tags"
+    });
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if (!user.problemSolved || user.problemSolved.length === 0) {
+        throw new ApiError(404, "No problems solved by this user");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { problemsSolved: user.problemSolved },
+                "Problems solved by user fetched successfully"
+            )
+        );
+});
