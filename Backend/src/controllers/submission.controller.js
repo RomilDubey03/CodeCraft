@@ -93,7 +93,7 @@ const submitSolution = asyncHandler(async (req, res) => {
     // If the solution is accepted, add the problem to the user's problemSolved array
     if (status === "accepted") {
         const user = await User.findById(userId);
-        
+
         if (user && !user.problemSolved.includes(problemId)) {
             user.problemSolved.push(problemId);
             await user.save();
@@ -109,7 +109,8 @@ const submitSolution = asyncHandler(async (req, res) => {
                 totalTestCases: solutionSubmitResult.totalTestCases,
                 passedTestCases: casesPassed,
                 runtime,
-                memory
+                memory,
+                error: solutionSubmitResult.errorMessage
             },
             "Code submitted successfully"
         )

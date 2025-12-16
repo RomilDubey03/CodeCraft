@@ -33,8 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true,
-        sameSite: "None"
+        secure: process.env.NODE_ENV === "production"
     };
 
     return res
@@ -67,8 +66,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true,
-        sameSite: "None"
+        secure: process.env.NODE_ENV === "production"
     };
 
     const loggedInUser = await User.findById(user._id).select("-password");
@@ -90,8 +88,7 @@ const logOutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true,
-        sameSite: "None"
+        secure: process.env.NODE_ENV === "production"
     };
     return res
         .status(200)
@@ -99,9 +96,8 @@ const logOutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out Successfully!"));
 });
 
-
 //Admin Routes
-const adminRegister = asyncHandler(async (req, res) =>{
+const adminRegister = asyncHandler(async (req, res) => {
     // username, fullName, email, age, password
     validate(req.body);
     const { username, email, fullName, password, age } = req.body;
@@ -128,8 +124,7 @@ const adminRegister = asyncHandler(async (req, res) =>{
 
     const options = {
         httpOnly: true,
-        secure: true,
-        sameSite: "None"
+        secure: process.env.NODE_ENV === "production"
     };
 
     return res
@@ -140,4 +135,11 @@ const adminRegister = asyncHandler(async (req, res) =>{
         );
 });
 
-export { registerUser, loginUser, logOutUser, adminRegister};
+// Get Current User
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "User fetched successfully"));
+});
+
+export { registerUser, loginUser, logOutUser, adminRegister, getCurrentUser };

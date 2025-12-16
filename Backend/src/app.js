@@ -27,3 +27,4 @@ app.use("/api/v1/submissions", submissionRouter);
 
 
 export default app;
+// CORS configuration updated

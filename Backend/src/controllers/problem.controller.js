@@ -1,5 +1,6 @@
 import { Problem } from "../models/problem.model.js";
 import { User } from "../models/user.model.js";
+import Submission from "../models/submission.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import {
     getLanguageById,
@@ -10,6 +11,9 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 export const createProblem = asyncHandler(async (req, res) => {
+    console.log("start");
+
+    console.log(req.body);
     const {
         title,
         description,
@@ -36,7 +40,7 @@ export const createProblem = asyncHandler(async (req, res) => {
     ) {
         throw new ApiError(400, "Some fields are missing");
     }
-
+    console.log("all data correct");
     for (const ele of referenceSolution) {
         const { language, completeCode } = ele;
 
@@ -48,7 +52,7 @@ export const createProblem = asyncHandler(async (req, res) => {
                 `Invalid or unsupported language provided: '${language}'`
             );
         }
-
+        console.log("language correct");
         const submissions = visibleTestCases.map((testcase) => ({
             source_code: completeCode,
             language_id: languageId,
@@ -70,25 +74,39 @@ export const createProblem = asyncHandler(async (req, res) => {
         //     expected_output: "100" // Taken from the second test case
         //   }
         // ]
+        console.log("submissions correct");
         const batchSubmissionResult = await submitBatch(submissions);
+        console.log("batchSubmissionResult correct");
+        console.log(batchSubmissionResult);
 
         const tokenList = batchSubmissionResult.map((value) => value.token);
-
+        console.log("tokenList correct");
+        console.log(tokenList);
         const tokenSubmissionResult = await submitToken(tokenList);
-
+        console.log("tokenSubmissionResult correct");
         for (const test of tokenSubmissionResult) {
+            console.log(test);
             if (test.status_id != 3) {
+                console.log("test correct");
+                console.log(test.description);
                 return res
                     .status(400)
-                    .json(new ApiResponse(400, test.description));
+                    .json(
+                        new ApiResponse(
+                            400,
+                            test.description,
+                            "Submission Failed"
+                        )
+                    );
             }
         }
     }
-
+    console.log("all test cases correct");
     const problem = await Problem.create({
         ...req.body,
         problemCreator: req.user._id
     });
+    console.log("problem created");
 
     return res
         .status(200)
@@ -299,5 +317,33 @@ export const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
                 { problemsSolved: user.problemSolved },
                 "Problems solved by user fetched successfully"
             )
+        );
+});
+
+export const getSubmittedSolution = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const problemId = req.params.id;
+
+    const solutions = await Submission.find({
+        submittedByUser: userId,
+        solvedProblemId: problemId
+    });
+
+    if (!solutions || solutions.length === 0) {
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    [],
+                    "No Submissions by the user for this Problem"
+                )
+            );
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, solutions, "Submissions fetched successfully")
         );
 });
