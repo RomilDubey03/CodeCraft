@@ -21,10 +21,12 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
         const { _id } = decodedToken;
         if (!_id) throw new ApiError(401, "Invalid Token! - ID NOT FOUND");
 
-        const user = await User.findById(_id).select("-password");
+        const user = await User.findById(_id).select(" -password ");
         if (!user) throw new ApiError(404, "User Does Not Exists!");
 
-        const isBlocked = await redisClient.exists(`accessToken:${accessToken}`);
+        const isBlocked = await redisClient.exists(
+            `accessToken:${accessToken}`
+        );
         if (isBlocked) throw new ApiError(401, "Invalid Token! - BLOCKED");
 
         req.user = user;
