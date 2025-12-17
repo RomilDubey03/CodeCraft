@@ -46,6 +46,9 @@ import submissionRouter from "./routes/submission.routes.js";
 dotenv.config({ path: "./.env" });
 
 const app = express();
+// This tells Express: "Trust headers from Vercel/Nginx"
+// so it knows the original request was actually HTTPS.
+app.set("trust proxy", 1);
 
 // 2. Middleware
 app.use(

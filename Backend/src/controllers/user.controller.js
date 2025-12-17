@@ -34,9 +34,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        secure: true
+        secure: true,
+        sameSite: "None"
     };
 
     return res
@@ -69,9 +68,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        secure: true
+        secure: true,
+        sameSite: "None"
     };
 
     const loggedInUser = await User.findById(user._id).select("-password");
@@ -94,8 +92,8 @@ const logOutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         // secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        secure: true
+        secure: true,
+        sameSite: "None"
     };
     return res
         .status(200)
@@ -131,9 +129,8 @@ const adminRegister = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        //secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        secure: true
+        secure: true,
+        sameSite: "None"
     };
 
     return res
