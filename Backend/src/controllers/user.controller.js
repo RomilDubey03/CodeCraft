@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "None",
         secure: true
     };
@@ -68,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "None",
         secure: true
     };
@@ -92,7 +92,7 @@ const logOutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "None",
         secure: true
     };
@@ -130,7 +130,7 @@ const adminRegister = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        //secure: process.env.NODE_ENV === "production",
         sameSite: "None",
         secure: true
     };
