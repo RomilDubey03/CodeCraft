@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { redisClient } from "../db/redisDbConnect.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
 export const verifyJWT = asyncHandler(async (req, _, next) => {
     try {
