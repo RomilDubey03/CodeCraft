@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 import { redisClient } from "../db/redisDbConnect.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-export const verifyJWT = asyncHandler(async (req, _, next) => {
+export const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
         const accessToken =
             req.cookies?.accessToken ||
