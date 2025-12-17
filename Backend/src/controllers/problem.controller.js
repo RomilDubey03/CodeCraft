@@ -306,7 +306,15 @@ export const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
     }
 
     if (!user.problemSolved || user.problemSolved.length === 0) {
-        throw new ApiError(404, "No problems solved by this user");
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { problemsSolved: [] },
+                    "No problems solved by this user"
+                )
+            );
     }
 
     return res
