@@ -5,6 +5,7 @@ import ApiError from "../utils/apiError.js";
 import validate from "../utils/dataValidator.js";
 import { redisClient } from "../db/redisDbConnect.js";
 import JWT from "jsonwebtoken";
+//import { generateAccessToken } from "../utils/generateToken.js";
 //Register
 const registerUser = asyncHandler(async (req, res) => {
     // username, fullName, email, age, password
@@ -25,9 +26,9 @@ const registerUser = asyncHandler(async (req, res) => {
         role: "user"
     });
 
-    const accessToken = user.generateAccessToken(user._id);
+    const accessToken = user.generateAccessToken();
 
-    const createdUser = await User.findById(user._id).select("-password");
+    const createdUser = await User.findById(user._id).select(" -password");
 
     if (!createdUser) throw new ApiError(500, "User not registered");
 
@@ -64,7 +65,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPasswordCorrect)
         throw new ApiError(401, "Invalid user credentials!");
 
-    const accessToken = user.generateAccessToken(user._id);
+    const accessToken = user.generateAccessToken();
 
     const options = {
         httpOnly: true,
@@ -122,7 +123,7 @@ const adminRegister = asyncHandler(async (req, res) => {
         role: "admin"
     });
 
-    const accessToken = user.generateAccessToken(user._id);
+    const accessToken = user.generateAccessToken();
 
     const createdUser = await User.findById(user._id).select("-password");
 

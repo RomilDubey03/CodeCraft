@@ -17,15 +17,18 @@ export const verifyAdminJWT = asyncHandler(async (req, _, next) => {
             process.env.ACCESS_TOKEN_SECRET
         );
 
-        const { _id, role} = decodedToken;
+        const { _id, role } = decodedToken;
         if (!_id) throw new ApiError(401, "Invalid Token! - ID NOT FOUND");
 
-        if(role != "admin") throw new ApiError(401, "You are not authorised for admin routes!");
+        if (role != "admin")
+            throw new ApiError(401, "You are not authorised for admin routes!");
 
-        const user = await User.findById(_id).select("-password");
+        const user = await User.findById(_id).select(" -password ");
         if (!user) throw new ApiError(404, "User Does Not Exists!");
 
-        const isBlocked = await redisClient.exists(`accessToken:${accessToken}`);
+        const isBlocked = await redisClient.exists(
+            `accessToken:${accessToken}`
+        );
         if (isBlocked) throw new ApiError(401, "Invalid Token! - BLOCKED");
 
         req.user = user;
