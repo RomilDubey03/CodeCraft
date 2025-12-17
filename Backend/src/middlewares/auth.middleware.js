@@ -10,8 +10,17 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
             req.cookies?.accessToken ||
             req.header("Authorization")?.replace("Bearer ", "");
 
-        if (!accessToken)
-            throw new ApiError(401, "Unauthorised Access - Token Missing");
+        if (!accessToken) {
+            return res
+                .status(401)
+                .json(
+                    new ApiResponse(
+                        401,
+                        {},
+                        "Unauthorised Access - Token Missing"
+                    )
+                );
+        }
 
         const decodedToken = JWT.verify(
             accessToken,
