@@ -13,7 +13,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
         if (!accessToken) {
             return res
-                .status(401)
+                .status(300)
                 .json(
                     new ApiResponse(
                         401,
