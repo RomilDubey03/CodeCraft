@@ -13,10 +13,10 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
         if (!accessToken) {
             return res
-                .status(301)
+                .status(401)
                 .json(
                     new ApiResponse(
-                        301,
+                        401,
                         {},
                         "Unauthorised Access - Token Missing"
                     )
