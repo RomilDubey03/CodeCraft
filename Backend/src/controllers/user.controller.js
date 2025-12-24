@@ -35,7 +35,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
 
     return res
@@ -69,7 +70,8 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
 
     const loggedInUser = await User.findById(user._id).select("-password");
@@ -91,9 +93,9 @@ const logOutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
     return res
         .status(200)
@@ -130,7 +132,8 @@ const adminRegister = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
 
     return res
